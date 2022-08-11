@@ -6,14 +6,18 @@ from io import DEFAULT_BUFFER_SIZE
 
 import websockets
 from keys import get_client_data
-from requests import Session
+import requests
 
 API_BASE = "https://openapi.vito.ai"
 
 def get_keys() :
     data = get_client_data()
-    print(data)
-
+    resp = requests.post(
+        API_BASE +"/v1/authenticate",
+        data = data
+    )
+    resp.raise_for_status()
+    return resp.json()
 
 class Client :
     def __init__(self, client_id, client_secret) :
@@ -26,4 +30,4 @@ class Client :
 
 
 if __name__ == "__main__" :
-    get_keys()
+    print(get_keys())
