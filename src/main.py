@@ -5,12 +5,15 @@ import time
 from io import DEFAULT_BUFFER_SIZE
 
 import websockets
+from keys import get_client_data
 from requests import Session
 
 API_BASE = "https://openapi.vito.ai"
 
-def get_keys(key) :
-    :
+def get_keys() :
+    data = get_client_data()
+    print(data)
+
 
 class Client :
     def __init__(self, client_id, client_secret) :
@@ -21,10 +24,6 @@ class Client :
         self._sess = Session()
         self._token = None
 
-    @property
-    def token(self) :
-        if self._token is None or self._token["expire_at"] < time.time() :
-            resp = self._sess.post{
 
-            }
-
+if __name__ == "__main__" :
+    get_keys()
