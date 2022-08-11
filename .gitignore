@@ -3,3 +3,4 @@ include/*
 lib/*
 pyvenv.cfg
 src/keys.py
+src/__pycache__
