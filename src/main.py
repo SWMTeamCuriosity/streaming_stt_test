@@ -28,7 +28,40 @@ class Client :
             resp.raise_for_status()
         return self._token["access_token"]
 
+    async def streaming_transcribe(self, filename, config=None) :
+        if config is none:
+            config = dict(sample_rate = "8000", encoding = "WAV", use_itn = "true", use_disfluency_filter = "true", use_profanity_filter = "false")
+        STREAMING_ENDPOINT = "wss://{}/v1/transcribe:streaming?{}".format(
+            API_BASE.split("//")[1], "&".join(map("=".join, config.items()))
+        )
+        conn_kwargs = dict(extra_headers={"Authorization" : "bearer " + self.token})
+
+        async def streamer(websocket) :
+            with open(filename, "rb") as f:
+                while True :
+                    buff = f.read(DEFAULT_BUFFER_SIZE)
+                    if buff is None or len(buff) == 0 :
+                        break
+                    await websocket.send(buff)
+                await websocket.send("EOS")
+
+        async def transcriber(websocket) :
+            async for msg in websocket :
+                msg = json.loads(msg)
+                print(msg)
+                if msg["final"] :
+                    print("final ended with " + msg["alternatives"][0]["text"])
+
+        async with websockets.connect(STREAMING_ENDPOINT, **conn_kwargs) as websocket :
+            await asyncio.gather(
+                streamer(websocket)
+                transcriber(websocket)
+            )
+
 
 if __name__ == "__main__" :
     client_data = get_client_data()
+    client = VITOOpenAPIClient(client_data)
 
+    fname = "../data/test.wav"
+    asyncio.run(client.streaming_transcribe(fname))
