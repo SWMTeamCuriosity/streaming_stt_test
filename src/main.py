@@ -28,12 +28,11 @@ class Client :
 
             resp.raise_for_status()
             self._token = resp.json()
-            print(self._token)
         return self._token["access_token"]
 
     async def streaming_transcribe(self, filename, config=None) :
         if config is None:
-            config = dict(sample_rate = "44100", encoding = "LINEAR16", use_itn = "true", use_disfluency_filter = "false", use_profanity_filter = "false")
+            config = dict(sample_rate = "8000", encoding = "LINEAR16", use_itn = "true", use_disfluency_filter = "true", use_profanity_filter = "false")
 
         STREAMING_ENDPOINT = "wss://{}/v1/transcribe:streaming?{}".format(
             API_BASE.split("//")[1], "&".join(map("=".join, config.items()))
@@ -68,5 +67,5 @@ if __name__ == "__main__" :
     client_data = get_client_data()
     client = Client(client_data)
 
-    fname = "../data/test.wav"
+    fname = "../data/test.pcm"
     asyncio.run(client.streaming_transcribe(fname))
