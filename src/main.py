@@ -37,6 +37,7 @@ class Client :
         STREAMING_ENDPOINT = "wss://{}/v1/transcribe:streaming?{}".format(
             API_BASE.split("//")[1], "&".join(map("=".join, config.items()))
         )
+
         print(STREAMING_ENDPOINT)
 
         conn_kwargs = dict(extra_headers={"Authorization" : "bearer " + self.token})
@@ -53,7 +54,6 @@ class Client :
         async def transcriber(websocket) :
             async for msg in websocket :
                 msg = json.loads(msg)
-                print(msg)
                 if msg["final"] :
                     print("final ended with " + msg["alternatives"][0]["text"])
 
